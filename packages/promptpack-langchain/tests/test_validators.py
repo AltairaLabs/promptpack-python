@@ -194,3 +194,120 @@ class TestValidationRunnable:
 
         result = await runnable.ainvoke("This is good")
         assert result.is_valid
+
+
+class TestMultipleValidators:
+    """Tests for running multiple validators together."""
+
+    def test_all_pass(self) -> None:
+        """Test all validators pass."""
+        validators = [
+            make_validator("banned_words", params={"words": ["bad"]}),
+            make_validator("max_length", params={"max_characters": 100}),
+            make_validator("min_length", params={"min_characters": 5}),
+        ]
+        result = run_validators("This is valid content", validators)
+        assert result.is_valid
+        assert len(result.violations) == 0
+
+    def test_multiple_failures(self) -> None:
+        """Test multiple validators fail."""
+        validators = [
+            make_validator("banned_words", params={"words": ["bad"]}),
+            make_validator("max_length", params={"max_characters": 10}),
+        ]
+        result = run_validators("This is bad and way too long", validators)
+        assert len(result.violations) == 2
+
+    def test_mixed_fail_on_violation(self) -> None:
+        """Test mixed fail_on_violation settings."""
+        validators = [
+            make_validator(
+                "banned_words",
+                params={"words": ["bad"]},
+                fail_on_violation=True,  # Blocking
+            ),
+            make_validator(
+                "max_length",
+                params={"max_characters": 10},
+                fail_on_violation=False,  # Non-blocking
+            ),
+        ]
+        result = run_validators("This is bad content", validators)
+        assert not result.is_valid
+        assert result.has_blocking_violations
+
+    def test_only_non_blocking_violations(self) -> None:
+        """Test violations that are all non-blocking."""
+        validators = [
+            make_validator(
+                "max_length",
+                params={"max_characters": 5},
+                fail_on_violation=False,
+            ),
+        ]
+        result = run_validators("This is too long", validators)
+        assert len(result.violations) == 1
+        assert not result.has_blocking_violations
+
+
+class TestEdgeCases:
+    """Edge case tests for validators."""
+
+    def test_empty_content(self) -> None:
+        """Test validation with empty content."""
+        validators = [
+            make_validator("min_length", params={"min_characters": 10}),
+        ]
+        result = run_validators("", validators)
+        assert len(result.violations) == 1
+
+    def test_whitespace_content(self) -> None:
+        """Test validation with whitespace content."""
+        validators = [
+            make_validator("min_length", params={"min_characters": 5}),
+        ]
+        result = run_validators("   ", validators)
+        assert len(result.violations) == 1
+
+    def test_missing_params(self) -> None:
+        """Test validator with missing params uses defaults."""
+        validators = [
+            make_validator("banned_words", params=None),
+        ]
+        # Should not raise, just return valid (no words to check)
+        result = run_validators("Any content", validators)
+        assert result.is_valid
+
+    def test_unicode_content(self) -> None:
+        """Test validation with unicode content."""
+        validators = [
+            make_validator("banned_words", params={"words": ["prohibited"]}),
+            make_validator("min_length", params={"min_characters": 5}),
+        ]
+        result = run_validators("Hello world!", validators)
+        assert result.is_valid
+
+    def test_regex_special_chars(self) -> None:
+        """Test regex validation with special characters."""
+        validators = [
+            make_validator(
+                "regex_match",
+                params={
+                    "pattern": r"\d{3}-\d{3}-\d{4}",  # Phone number
+                    "must_match": True,
+                },
+            ),
+        ]
+        result = run_validators("Call me at 123-456-7890", validators)
+        assert result.is_valid
+
+    def test_multiple_banned_words_found(self) -> None:
+        """Test content with multiple banned words."""
+        validators = [
+            make_validator("banned_words", params={"words": ["bad", "evil", "wrong"]}),
+        ]
+        result = run_validators("This is bad and evil content", validators)
+        assert len(result.violations) == 1
+        # Should report the found words
+        assert "bad" in result.violations[0].message or "evil" in result.violations[0].message

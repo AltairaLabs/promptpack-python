@@ -23,6 +23,7 @@ export default defineConfig({
       sidebar: [
         { label: 'Getting Started', autogenerate: { directory: 'getting-started' } },
         { label: 'Packages', autogenerate: { directory: 'packages' } },
+        { label: 'Examples', autogenerate: { directory: 'examples' } },
         { label: 'API Reference', autogenerate: { directory: 'api' } },
         { label: 'Contributors', autogenerate: { directory: 'contributors' } },
       ],
