@@ -4,7 +4,6 @@
 """Tests for PromptPack variable validation."""
 
 import pytest
-
 from promptpack.types import Variable, VariableValidation
 from promptpack.variables import (
     VariableValidationError,
@@ -282,7 +281,5 @@ class TestValidateVariables:
     def test_unknown_variable_non_strict(self) -> None:
         """Test unknown variables ignored in non-strict mode."""
         variables = [make_variable(name="name")]
-        result = validate_variables(
-            variables, {"name": "Alice", "extra": "value"}, strict=False
-        )
+        result = validate_variables(variables, {"name": "Alice", "extra": "value"}, strict=False)
         assert result == {"name": "Alice"}

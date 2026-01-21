@@ -5,10 +5,10 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from langchain_core.tools import StructuredTool
-
 from promptpack import PromptPack, Tool
 
 
@@ -77,10 +77,7 @@ def convert_tools(
     else:
         tools = []
 
-    return [
-        convert_tool(tool, handler=handlers.get(tool.name))
-        for tool in tools
-    ]
+    return [convert_tool(tool, handler=handlers.get(tool.name)) for tool in tools]
 
 
 def _build_args_schema(tool: Tool) -> type:
@@ -92,7 +89,7 @@ def _build_args_schema(tool: Tool) -> type:
     Returns:
         A Pydantic model class for the tool arguments.
     """
-    from pydantic import BaseModel, Field, create_model
+    from pydantic import Field, create_model
 
     if tool.parameters is None:
         # No parameters - return empty model

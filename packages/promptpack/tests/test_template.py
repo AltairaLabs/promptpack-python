@@ -4,7 +4,6 @@
 """Tests for PromptPack template engine."""
 
 import pytest
-
 from promptpack.template import TemplateEngine, TemplateError
 
 

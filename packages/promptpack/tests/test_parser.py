@@ -6,7 +6,6 @@
 from pathlib import Path
 
 import pytest
-
 from promptpack import parse_promptpack, parse_promptpack_string
 from promptpack.parser import PromptPackParseError
 

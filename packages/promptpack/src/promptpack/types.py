@@ -291,9 +291,9 @@ class TemplateEngine(BaseModel):
 
     version: str
     syntax: str
-    features: list[
-        Literal["basic_substitution", "fragments", "conditionals", "loops", "filters"]
-    ] | None = None
+    features: (
+        list[Literal["basic_substitution", "fragments", "conditionals", "loops", "filters"]] | None
+    ) = None
 
 
 class Compilation(BaseModel):

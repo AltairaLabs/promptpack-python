@@ -8,7 +8,6 @@ from __future__ import annotations
 from typing import Any
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-
 from promptpack import ContentPart
 
 
@@ -28,10 +27,12 @@ def convert_content_parts(parts: list[ContentPart]) -> list[dict[str, Any]]:
 
     for part in parts:
         if part.type == "text":
-            result.append({
-                "type": "text",
-                "text": part.text or "",
-            })
+            result.append(
+                {
+                    "type": "text",
+                    "text": part.text or "",
+                }
+            )
         elif part.type == "image" and part.media:
             result.append(_convert_image_part(part))
         elif part.type == "audio" and part.media:
@@ -41,10 +42,12 @@ def convert_content_parts(parts: list[ContentPart]) -> list[dict[str, Any]]:
         else:
             # Unknown or unsupported type - include as text if available
             if part.text:
-                result.append({
-                    "type": "text",
-                    "text": part.text,
-                })
+                result.append(
+                    {
+                        "type": "text",
+                        "text": part.text,
+                    }
+                )
 
     return result
 

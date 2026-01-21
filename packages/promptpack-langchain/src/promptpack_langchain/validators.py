@@ -6,11 +6,11 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Any, Sequence
+from typing import Any
 
 from langchain_core.runnables import Runnable, RunnableConfig
-
 from promptpack import Validator
 
 
@@ -209,7 +209,7 @@ class ValidationRunnable(Runnable[str, ValidationResult]):
 
     def invoke(
         self,
-        input: str,
+        input: str,  # noqa: A002 - required by Runnable interface
         config: RunnableConfig | None = None,
     ) -> ValidationResult:
         """Validate the input content.
@@ -225,7 +225,7 @@ class ValidationRunnable(Runnable[str, ValidationResult]):
 
     async def ainvoke(
         self,
-        input: str,
+        input: str,  # noqa: A002 - required by Runnable interface
         config: RunnableConfig | None = None,
     ) -> ValidationResult:
         """Async version of invoke."""

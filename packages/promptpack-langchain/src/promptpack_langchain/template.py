@@ -9,11 +9,10 @@ from typing import Any
 
 from langchain_core.prompts import BasePromptTemplate, ChatPromptTemplate
 from langchain_core.prompts.chat import MessageLikeRepresentation
-from pydantic import ConfigDict
-
-from promptpack import PromptPack, Prompt
+from promptpack import Prompt, PromptPack
 from promptpack.template import TemplateEngine as PPTemplateEngine
 from promptpack.variables import validate_variables
+from pydantic import ConfigDict
 
 
 class PromptPackTemplate(BasePromptTemplate):
@@ -37,7 +36,7 @@ class PromptPackTemplate(BasePromptTemplate):
         prompt_name: str,
         *,
         model_name: str | None = None,
-    ) -> "PromptPackTemplate":
+    ) -> PromptPackTemplate:
         """Create a PromptPackTemplate from a PromptPack.
 
         Args:
@@ -54,9 +53,7 @@ class PromptPackTemplate(BasePromptTemplate):
         prompt = pack.get_prompt(prompt_name)
         if prompt is None:
             available = list(pack.prompts.keys())
-            raise ValueError(
-                f"Prompt '{prompt_name}' not found in pack. Available: {available}"
-            )
+            raise ValueError(f"Prompt '{prompt_name}' not found in pack. Available: {available}")
 
         template_engine = PPTemplateEngine(
             syntax=pack.template_engine.syntax,
@@ -109,9 +106,7 @@ class PromptPackTemplate(BasePromptTemplate):
         """
         # Validate and apply defaults
         if self.prompt.variables:
-            validated = validate_variables(
-                self.prompt.variables, kwargs, strict=False
-            )
+            validated = validate_variables(self.prompt.variables, kwargs, strict=False)
         else:
             validated = kwargs
 

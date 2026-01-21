@@ -4,7 +4,6 @@
 """Tests for PromptPackTemplate."""
 
 import pytest
-
 from promptpack import parse_promptpack_string
 from promptpack_langchain import PromptPackTemplate
 
@@ -90,9 +89,7 @@ class TestPromptPackTemplate:
 
     def test_model_override_template(self, pack) -> None:
         """Test model-specific template override."""
-        template = PromptPackTemplate.from_promptpack(
-            pack, "support", model_name="gpt-4"
-        )
+        template = PromptPackTemplate.from_promptpack(pack, "support", model_name="gpt-4")
         result = template.format(role="agent", company="TestCo")
         assert "[GPT-4 Mode]" in result
 
@@ -105,9 +102,7 @@ class TestPromptPackTemplate:
 
     def test_get_parameters_with_override(self, pack) -> None:
         """Test model-specific parameter override."""
-        template = PromptPackTemplate.from_promptpack(
-            pack, "support", model_name="gpt-4"
-        )
+        template = PromptPackTemplate.from_promptpack(pack, "support", model_name="gpt-4")
         params = template.get_parameters()
         assert params["temperature"] == 0.5  # Override
         assert params["max_tokens"] == 1500  # Base
@@ -122,7 +117,5 @@ class TestPromptPackTemplate:
     def test_to_chat_prompt_template(self, pack) -> None:
         """Test conversion to ChatPromptTemplate."""
         template = PromptPackTemplate.from_promptpack(pack, "support")
-        chat_template = template.to_chat_prompt_template(
-            role="agent", company="TestCo"
-        )
+        chat_template = template.to_chat_prompt_template(role="agent", company="TestCo")
         assert chat_template is not None

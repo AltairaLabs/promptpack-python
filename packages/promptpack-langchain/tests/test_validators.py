@@ -4,7 +4,6 @@
 """Tests for PromptPack validators."""
 
 import pytest
-
 from promptpack import Validator
 from promptpack_langchain import ValidationRunnable, run_validators
 

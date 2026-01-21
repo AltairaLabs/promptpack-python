@@ -153,20 +153,14 @@ def _validate_rules(variable: Variable, value: Any) -> None:
     # Numeric validation
     if isinstance(value, (int, float)) and not isinstance(value, bool):
         if rules.minimum is not None and value < rules.minimum:
-            raise VariableValidationError(
-                variable.name, f"Value below minimum: {rules.minimum}"
-            )
+            raise VariableValidationError(variable.name, f"Value below minimum: {rules.minimum}")
 
         if rules.maximum is not None and value > rules.maximum:
-            raise VariableValidationError(
-                variable.name, f"Value above maximum: {rules.maximum}"
-            )
+            raise VariableValidationError(variable.name, f"Value above maximum: {rules.maximum}")
 
     # Enum validation
     if rules.enum is not None and value not in rules.enum:
-        raise VariableValidationError(
-            variable.name, f"Value not in allowed values: {rules.enum}"
-        )
+        raise VariableValidationError(variable.name, f"Value not in allowed values: {rules.enum}")
 
 
 def validate_variables(
