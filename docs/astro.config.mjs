@@ -2,13 +2,11 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightThemeGalaxy from 'starlight-theme-galaxy';
-import d2 from 'astro-d2';
 
 export default defineConfig({
   site: 'https://altairalabs.github.io',
   base: '/promptpack-python',
   integrations: [
-    d2(),
     starlight({
       title: 'PromptPack Python',
       logo: {
