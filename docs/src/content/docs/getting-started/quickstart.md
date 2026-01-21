@@ -15,31 +15,16 @@ from promptpack import parse_promptpack
 # Parse from file
 pack = parse_promptpack("path/to/pack.json")
 
-# Access prompts
-prompt = pack.prompts["support"]
+# Access pack metadata
+print(f"Pack: {pack.name} v{pack.version}")
+print(f"Prompts: {list(pack.prompts.keys())}")
+
+# Access a specific prompt
+prompt = pack.get_prompt("support")
 print(prompt.system_template)
 ```
 
-### Rendering Templates
-
-```python
-from promptpack import parse_promptpack
-
-pack = parse_promptpack("path/to/pack.json")
-prompt = pack.prompts["support"]
-
-# Render template with variables
-rendered = prompt.render({
-    "role": "support agent",
-    "company": "Acme Inc."
-})
-
-print(rendered)
-```
-
-## LangChain Integration
-
-### Creating Prompt Templates
+### Using with LangChain
 
 ```python
 from promptpack import parse_promptpack
@@ -50,14 +35,19 @@ pack = parse_promptpack("path/to/pack.json")
 # Create LangChain prompt template
 template = PromptPackTemplate.from_promptpack(pack, "support")
 
-# Use with LangChain
-messages = template.format_messages(
+# Check input variables and parameters
+print(template.input_variables)  # ['role', 'company']
+print(template.get_parameters())  # {'temperature': 0.7, 'max_tokens': 1500}
+
+# Format the template
+formatted = template.format(
     role="support agent",
     company="Acme Inc."
 )
+print(formatted)
 ```
 
-### Converting Tools
+## Converting Tools
 
 ```python
 from promptpack import parse_promptpack
@@ -65,12 +55,49 @@ from promptpack_langchain import convert_tools
 
 pack = parse_promptpack("path/to/pack.json")
 
-# Convert tools to LangChain format
-tools = convert_tools(pack)
+# Define tool handlers
+def lookup_customer(customer_id: str) -> str:
+    return f"Customer: {customer_id}"
 
-# Use with LangChain agent
-from langchain.agents import create_tool_calling_agent
-agent = create_tool_calling_agent(llm, tools, prompt)
+handlers = {"lookup_customer": lookup_customer}
+
+# Convert tools to LangChain format with handlers
+tools = convert_tools(pack, prompt_name="sales", handlers=handlers)
+
+# Execute a tool
+result = tools[0].invoke({"customer_id": "CUST-001"})
+print(result)
+```
+
+## Validating Output
+
+```python
+from promptpack import Validator
+from promptpack_langchain import run_validators
+
+validators = [
+    Validator(
+        type="banned_words",
+        enabled=True,
+        fail_on_violation=True,
+        params={"words": ["inappropriate", "offensive"]}
+    ),
+    Validator(
+        type="max_length",
+        enabled=True,
+        fail_on_violation=False,
+        params={"max_characters": 500}
+    )
+]
+
+# Validate LLM output
+result = run_validators("Here is my response...", validators)
+
+if result.is_valid:
+    print("Output is valid!")
+else:
+    for v in result.violations:
+        print(f"Violation: {v.message}")
 ```
 
 ## Example PromptPack
@@ -79,25 +106,53 @@ Here's an example PromptPack JSON file:
 
 ```json
 {
-  "version": "1.0",
-  "name": "support-agent",
+  "$schema": "https://promptpack.org/schema/v1.0/promptpack.schema.json",
+  "id": "customer-support",
+  "name": "Customer Support Pack",
+  "version": "1.0.0",
+  "template_engine": {
+    "version": "v1",
+    "syntax": "{{variable}}"
+  },
+  "fragments": {
+    "guidelines": "Be helpful and professional. Always verify customer identity."
+  },
   "prompts": {
     "support": {
-      "system": "You are a {{role}} at {{company}}. Help customers with their questions.",
-      "variables": {
-        "role": {
+      "id": "support",
+      "name": "Support Agent",
+      "version": "1.0.0",
+      "system_template": "You are a {{role}} at {{company}}.\n\n{{fragment:guidelines}}",
+      "variables": [
+        {
+          "name": "role",
           "type": "string",
+          "required": true,
           "description": "The role of the agent"
         },
-        "company": {
+        {
+          "name": "company",
           "type": "string",
+          "required": true,
           "description": "The company name"
         }
-      }
+      ],
+      "parameters": {
+        "temperature": 0.7,
+        "max_tokens": 1500
+      },
+      "validators": [
+        {
+          "type": "banned_words",
+          "enabled": true,
+          "fail_on_violation": true,
+          "params": {"words": ["inappropriate"]}
+        }
+      ]
     }
   },
-  "tools": [
-    {
+  "tools": {
+    "search_docs": {
       "name": "search_docs",
       "description": "Search the documentation",
       "parameters": {
@@ -111,6 +166,12 @@ Here's an example PromptPack JSON file:
         "required": ["query"]
       }
     }
-  ]
+  }
 }
 ```
+
+## Next Steps
+
+- Check out the [Examples](/promptpack-python/examples/) for more detailed usage patterns
+- Learn about [Tools Integration](/promptpack-python/examples/tools/) for agent workflows
+- Explore [Validation](/promptpack-python/examples/validation/) for output guardrails
