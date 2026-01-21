@@ -1,0 +1,47 @@
+---
+title: PromptPack Python
+description: Python libraries for parsing and using PromptPacks with LangChain integration.
+template: splash
+hero:
+  tagline: Parse and use PromptPacks in your Python applications
+  actions:
+    - text: Get Started
+      link: /getting-started/installation/
+      icon: right-arrow
+    - text: View on GitHub
+      link: https://github.com/AltairaLabs/promptpack-python
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Features
+
+<CardGrid stagger>
+  <Card title="PromptPack Parser" icon="document">
+    Parse PromptPack JSON files with full type safety and validation.
+  </Card>
+  <Card title="LangChain Integration" icon="puzzle">
+    Seamlessly convert PromptPacks to LangChain prompt templates.
+  </Card>
+  <Card title="Tool Support" icon="setting">
+    Convert PromptPack tools to LangChain-compatible tool definitions.
+  </Card>
+  <Card title="Variable Rendering" icon="pencil">
+    Render templates with variables and support for complex types.
+  </Card>
+  <Card title="Fragment Support" icon="add-document">
+    Use reusable prompt fragments across your templates.
+  </Card>
+  <Card title="Multimodal Content" icon="rocket">
+    Support for multimodal content including images and structured data.
+  </Card>
+</CardGrid>
+
+## Packages
+
+This monorepo contains two packages:
+
+- **promptpack** - Base library for parsing PromptPack JSON files
+- **promptpack-langchain** - LangChain integration for PromptPacks
