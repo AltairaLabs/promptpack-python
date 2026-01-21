@@ -1,0 +1,131 @@
+{
+  "$schema": "https://promptpack.org/schema/v1/promptpack.schema.json",
+  "id": "customer-support",
+  "name": "Customer Support Pack",
+  "version": "1.0.0",
+  "description": "Complete customer support prompt pack with multiple task types",
+  "template_engine": {
+    "version": "v1",
+    "syntax": "{{variable}}",
+    "features": ["basic_substitution", "fragments"]
+  },
+  "prompts": {
+    "support": {
+      "id": "support",
+      "name": "Support Bot",
+      "description": "General customer support assistant",
+      "version": "1.0.0",
+      "system_template": "You are a {{role}} assistant for {{company}}.\n\n{{fragment:guidelines}}\n\nCustomer: {{customer_name}}",
+      "variables": [
+        {
+          "name": "role",
+          "type": "string",
+          "required": true,
+          "description": "The role of the assistant",
+          "example": "support agent"
+        },
+        {
+          "name": "company",
+          "type": "string",
+          "required": true,
+          "description": "Company name"
+        },
+        {
+          "name": "customer_name",
+          "type": "string",
+          "required": false,
+          "default": "Guest",
+          "description": "Customer's name"
+        }
+      ],
+      "tools": ["lookup_order", "create_ticket"],
+      "tool_policy": {
+        "tool_choice": "auto",
+        "max_rounds": 5,
+        "blocklist": ["dangerous_tool"]
+      },
+      "parameters": {
+        "temperature": 0.7,
+        "max_tokens": 1500
+      },
+      "validators": [
+        {
+          "type": "banned_words",
+          "enabled": true,
+          "fail_on_violation": false,
+          "params": {
+            "words": ["inappropriate", "banned"]
+          }
+        }
+      ]
+    },
+    "sales": {
+      "id": "sales",
+      "name": "Sales Bot",
+      "version": "1.0.0",
+      "system_template": "You are a sales assistant for {{company}}. Help customers find products.",
+      "variables": [
+        {
+          "name": "company",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "parameters": {
+        "temperature": 0.9,
+        "max_tokens": 2000
+      }
+    }
+  },
+  "fragments": {
+    "guidelines": "Always be helpful and professional. Never provide false information."
+  },
+  "tools": {
+    "lookup_order": {
+      "name": "lookup_order",
+      "description": "Look up order details by order ID",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "description": "The order ID to look up"
+          }
+        },
+        "required": ["order_id"]
+      }
+    },
+    "create_ticket": {
+      "name": "create_ticket",
+      "description": "Create a support ticket",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Ticket title"
+          },
+          "description": {
+            "type": "string",
+            "description": "Ticket description"
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high"],
+            "description": "Ticket priority"
+          }
+        },
+        "required": ["title", "description"]
+      }
+    },
+    "dangerous_tool": {
+      "name": "dangerous_tool",
+      "description": "A tool that should be blocklisted"
+    }
+  },
+  "metadata": {
+    "domain": "customer-service",
+    "language": "en",
+    "tags": ["support", "sales", "customer-service"]
+  }
+}
