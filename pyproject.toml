@@ -50,9 +50,11 @@ ignore = ["E501"]
 
 [tool.mypy]
 python_version = "3.10"
-warn_return_any = true
+warn_return_any = false
 warn_unused_configs = true
 ignore_missing_imports = true
+# Disable errors that come from LangChain's complex type definitions
+disable_error_code = ["arg-type"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

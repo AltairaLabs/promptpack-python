@@ -211,12 +211,14 @@ class ValidationRunnable(Runnable[str, ValidationResult]):
         self,
         input: str,  # noqa: A002 - required by Runnable interface
         config: RunnableConfig | None = None,
+        **kwargs: Any,
     ) -> ValidationResult:
         """Validate the input content.
 
         Args:
             input: Content to validate.
             config: Optional runnable config.
+            **kwargs: Additional arguments (ignored).
 
         Returns:
             ValidationResult with any violations.
@@ -227,6 +229,7 @@ class ValidationRunnable(Runnable[str, ValidationResult]):
         self,
         input: str,  # noqa: A002 - required by Runnable interface
         config: RunnableConfig | None = None,
+        **kwargs: Any,
     ) -> ValidationResult:
         """Async version of invoke."""
         return self.invoke(input, config)
