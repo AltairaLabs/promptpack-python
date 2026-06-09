@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 
 from pydantic import ValidationError
 
+from promptpack.schema import get_validator
 from promptpack.types import PromptPack
 
 if TYPE_CHECKING:
@@ -67,6 +68,20 @@ def parse_promptpack_string(content: str) -> PromptPack:
         data = json.loads(content)
     except json.JSONDecodeError as e:
         raise PromptPackParseError(f"Invalid JSON: {e}") from e
+
+    # Authoritative validation against the vendored spec schema. This is the
+    # single source of truth: it accepts every spec-defined section (including
+    # extensions like evals, workflow, agents and skills), so a spec-valid pack
+    # is never rejected just because the typed models below don't cover it yet.
+    schema_errors = sorted(get_validator().iter_errors(data), key=lambda err: list(err.path))
+    if schema_errors:
+        errors = [
+            {"loc": list(err.absolute_path), "msg": err.message, "type": "schema"}
+            for err in schema_errors
+        ]
+        raise PromptPackParseError(
+            f"PromptPack validation failed: {len(errors)} error(s)", errors=errors
+        )
 
     try:
         return PromptPack.model_validate(data)
