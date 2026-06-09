@@ -252,9 +252,16 @@ class MediaConfig(BaseModel):
 
 
 class Prompt(BaseModel):
-    """A single prompt configuration within a pack."""
+    """A single prompt configuration within a pack.
 
-    model_config = ConfigDict(extra="forbid")
+    Uses ``extra="ignore"`` so spec-defined extension sections (e.g. prompt-level
+    ``evals``) do not break typed construction — the vendored JSON Schema is the
+    authoritative validator (see ``promptpack.schema``). These models are a typed
+    view of the stable core; extension data is validated by the schema but not
+    surfaced here.
+    """
+
+    model_config = ConfigDict(extra="ignore")
 
     id: str = Field(..., pattern=r"^[a-z][a-z0-9_-]*$")
     name: str = Field(..., min_length=1)
@@ -329,9 +336,15 @@ class PackMetadata(BaseModel):
 
 
 class PromptPack(BaseModel):
-    """Top-level PromptPack container."""
+    """Top-level PromptPack container.
 
-    model_config = ConfigDict(extra="forbid")
+    Uses ``extra="ignore"`` so spec-defined extension sections (``evals``,
+    ``workflow``, ``agents``, ``skills``, …) do not break typed construction.
+    The vendored JSON Schema (see ``promptpack.schema``) is the authoritative
+    validator; these models are a typed view of the stable core.
+    """
+
+    model_config = ConfigDict(extra="ignore")
 
     schema_url: str | None = Field(default=None, alias="$schema")
     id: str = Field(..., pattern=r"^[a-z][a-z0-9-]*$", min_length=1, max_length=100)

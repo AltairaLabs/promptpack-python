@@ -3,6 +3,7 @@
 
 """Tests for PromptPack parser."""
 
+import json
 from pathlib import Path
 
 import pytest
@@ -134,3 +135,29 @@ def test_variable_access(sample_pack_content: str) -> None:
     assert customer_var is not None
     assert customer_var.required is False
     assert customer_var.default == "Guest"
+
+
+def test_parse_pack_with_evals(sample_pack_content: str) -> None:
+    """A pack using the spec's evals extension (RFC-0006) must parse.
+
+    Evals are a runtime-interpreted, spec-defined extension. The parser
+    validates against the vendored PromptPack schema, which accepts them, so a
+    pack carrying pack- and prompt-level evals must not be rejected.
+    """
+    data = json.loads(sample_pack_content)
+    data["evals"] = [
+        {
+            "id": "brand-consistency",
+            "type": "regex",
+            "trigger": "on_session_complete",
+            "params": {"pattern": "Acme"},
+        }
+    ]
+    first_prompt = next(iter(data["prompts"]))
+    data["prompts"][first_prompt]["evals"] = [
+        {"id": "tone", "type": "llm_judge", "trigger": "every_turn"}
+    ]
+
+    pack = parse_promptpack_string(json.dumps(data))
+
+    assert pack.id == "customer-support"
