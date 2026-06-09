@@ -10,8 +10,11 @@ This monorepo contains the following packages:
 
 Base library for parsing PromptPack JSON files. No framework dependencies.
 
+> **Note:** not yet published to PyPI — install from source until the first release.
+
 ```bash
-pip install promptpack
+# From source (until published to PyPI)
+pip install "git+https://github.com/AltairaLabs/promptpack-python.git#subdirectory=packages/promptpack"
 ```
 
 ```python
@@ -32,8 +35,11 @@ rendered = prompt.render({"role": "support agent", "company": "Acme"})
 
 LangChain integration for PromptPacks.
 
+> **Note:** not yet published to PyPI — install from source until the first release.
+
 ```bash
-pip install promptpack-langchain
+# From source (until published to PyPI)
+pip install "git+https://github.com/AltairaLabs/promptpack-python.git#subdirectory=packages/promptpack-langchain"
 ```
 
 ```python
