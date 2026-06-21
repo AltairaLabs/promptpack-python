@@ -95,6 +95,16 @@ jobs:
           files: packages/promptpack/coverage-promptpack.xml,packages/promptpack-langchain/coverage-langchain.xml
           fail_ci_if_error: false
 
+      - name: Upload coverage for SonarCloud
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: |
+            packages/promptpack/coverage-promptpack.xml
+            packages/promptpack-langchain/coverage-langchain.xml
+          retention-days: 1
+
   examples:
     name: Verify Examples
     runs-on: ubuntu-latest
@@ -124,3 +134,28 @@ jobs:
 
       - name: Run validation_example
         run: python examples/validation_example.py
+
+  sonar:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.actor != 'dependabot[bot]'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage
+          path: packages
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@713881670b6b3676cda39549040e2d88c70d582e # v8.2.0
+        with:
+          # Fail the job when the quality gate fails (don't pass silently).
+          args: -Dsonar.qualitygate.wait=true
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
