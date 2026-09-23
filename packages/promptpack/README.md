@@ -22,6 +22,7 @@ print(prompt.system_template)
 
 # Render template with variables
 from promptpack import render_template
+
 rendered = render_template(prompt.system_template, {"name": "Alice"})
 ```
 

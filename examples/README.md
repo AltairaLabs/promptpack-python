@@ -85,8 +85,6 @@ chat_template = template.to_chat_prompt_template(
 chain = chat_template | model
 
 # Invoke
-response = chain.invoke({
-    "messages": [("human", "I was charged twice")]
-})
+response = chain.invoke({"messages": [("human", "I was charged twice")]})
 print(response.content)
 ```
